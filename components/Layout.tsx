@@ -69,7 +69,7 @@ const Layout: React.FC<LayoutProps> = ({
             <div className="bg-gradient-to-tr from-blue-600 to-indigo-600 p-1.5 rounded-xl shadow-indigo-100 shadow-md group-hover:scale-105 transition-transform flex-shrink-0">
               <GraduationCap className="h-5 w-5 text-white" />
             </div>
-            <span className="font-black text-sm sm:text-base tracking-tight text-slate-800 hidden lg:block">TNTT Kim Thành</span>
+            <span className="font-black text-sm sm:text-base tracking-tight text-slate-800 hidden lg:block">TNTT Management</span>
           </div>
         </div>
 

@@ -80,7 +80,7 @@ export const Badge = React.forwardRef<HTMLDivElement, { student: Student; logoUr
               GIÁO PHẬN BÙI CHU
             </div>
             <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: 1, color: '#1a1a2e', lineHeight: 1.35 }}>
-              GIÁO XỨ KIM THÀNH
+              TNTT MANAGEMENT
             </div>
           </div>
         </div>

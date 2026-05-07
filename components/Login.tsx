@@ -77,7 +77,7 @@ const Login: React.FC<LoginProps> = ({ onLoginSuccess, onLoginFailure }) => {
           </div>
 
           <div className="text-center mb-10">
-            <h1 className="text-3xl font-black text-slate-900 tracking-tight mb-2">TNTT Kim Thành</h1>
+            <h1 className="text-3xl font-black text-slate-900 tracking-tight mb-2">TNTT Management</h1>
             <p className="text-slate-500 font-bold px-6">Hệ thống Quản lý Học sinh & Sổ điểm trực tuyến</p>
           </div>
 
@@ -104,7 +104,7 @@ const Login: React.FC<LoginProps> = ({ onLoginSuccess, onLoginFailure }) => {
         </div>
 
         <div className="mt-8 text-center text-slate-400 text-xs font-bold uppercase tracking-widest">
-          &copy; {new Date().getFullYear()} TNTT Kim Thành Management
+          &copy; {new Date().getFullYear()} TNTT Management
         </div>
       </div>
 

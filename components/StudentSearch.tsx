@@ -58,7 +58,7 @@ const StudentSearch: React.FC<StudentSearchProps> = ({ isEmbedded = false, onSea
                             Tra Cứu Hồ Sơ
                         </h1>
                         <p className="text-blue-100 text-xs font-medium uppercase tracking-widest">
-                            TNTT Kim Thanh
+                            TNTT Management
                         </p>
                     </div>
                 </div>

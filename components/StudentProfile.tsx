@@ -378,7 +378,7 @@ const StudentProfile: React.FC<StudentProfileProps> = ({
                 {isGuestView && (
                     <div className="pt-6 border-t border-slate-50">
                         <p className="text-[10px] text-slate-300 uppercase tracking-[0.3em] font-bold">
-                            TNTT KIM THANH
+                            TNTT MANAGEMENT
                         </p>
                     </div>
                 )}

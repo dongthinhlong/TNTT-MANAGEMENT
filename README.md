@@ -1,6 +1,6 @@
-# TNTT Kim Thành - Hệ Thống Quản Lý Học Viên
+# TNTT Management - Hệ Thống Quản Lý Học Viên
 
-Chào mừng bạn đến với dự án **TNTT Kim Thành Management**. Đây là hệ thống quản lý học sinh, điểm số và điểm danh chuyên nghiệp được tối ưu hóa cho các đơn vị giáo dục hoặc đoàn thể (Thiếu Nhi Thánh Thể).
+Chào mừng bạn đến với dự án **TNTT Management**. Đây là hệ thống quản lý học sinh, điểm số và điểm danh chuyên nghiệp được tối ưu hóa cho các đơn vị giáo dục hoặc đoàn thể (Thiếu Nhi Thánh Thể).
 
 ## 🚀 Giới thiệu
 Hệ thống giúp tự động hóa quy trình quản lý từ việc hồ sơ học viên, nhập điểm, thống kê kết quả học tập cho đến việc điểm danh thông minh qua mã QR.
@@ -117,4 +117,4 @@ Thư mục `dist/` sẽ được tạo ra, bạn chỉ cần upload toàn bộ f
 Mọi ý đóng góp hoặc báo lỗi vui lòng tạo **Issue** hoặc gửi **Pull Request**. Cảm ơn bạn đã quan tâm đến dự án!
 
 ---
-**TNTT Kim Thành Team** - *Sáng tạo để phục vụ.*
+**TNTT Management Team** - *Sáng tạo để phục vụ.*

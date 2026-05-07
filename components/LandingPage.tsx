@@ -21,7 +21,7 @@ const LandingPage: React.FC<LandingPageProps> = ({ onLoginClick, isAuthenticated
                             <GraduationCap className="h-6 w-6 text-white" />
                         </div>
                         <div className="flex flex-col">
-                            <span className="font-extrabold text-lg text-slate-800 leading-none">TNTT Kim Thành</span>
+                            <span className="font-extrabold text-lg text-slate-800 leading-none">TNTT Management</span>
                             <span className="text-[10px] font-black text-blue-600 uppercase tracking-widest mt-0.5">Cổng Thông Tin Giáo Lý</span>
                         </div>
                     </div>
@@ -82,7 +82,7 @@ const LandingPage: React.FC<LandingPageProps> = ({ onLoginClick, isAuthenticated
                                 </span>
                             </h1>
                             <p className="text-lg md:text-xl text-slate-500 font-medium max-w-2xl mx-auto mb-12 leading-relaxed animate-in fade-in slide-in-from-bottom-8 duration-1000">
-                                Hệ thống trực tuyến tra cứu và quản lý tình hình học tập của các em thiếu nhi Giáo xứ Kim Thành.
+                                Hệ thống trực tuyến tra cứu và quản lý tình hình học tập của các em thiếu nhi.
                             </p>
 
                             <div className="flex flex-col md:flex-row items-center justify-center gap-4 animate-in fade-in slide-in-from-bottom-10 duration-1000">
@@ -131,7 +131,7 @@ const LandingPage: React.FC<LandingPageProps> = ({ onLoginClick, isAuthenticated
             <footer className="bg-white border-t border-slate-100 py-12 px-6">
                 <div className="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-6 text-center md:text-left">
                     <div>
-                        <span className="font-extrabold text-slate-800 text-lg">TNTT Kim Thành</span>
+                        <span className="font-extrabold text-slate-800 text-lg">TNTT Management</span>
                         <p className="text-sm text-slate-400 mt-2 font-medium">© 2026 Management System. All rights reserved.</p>
                     </div>
                     <div className="flex items-center gap-6">

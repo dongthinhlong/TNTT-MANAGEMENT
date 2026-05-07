@@ -1,6 +1,6 @@
 /**
  * =================================================================
- * TNTT KIM THÀNH - BACKEND HOÀN CHỈNH
+ * TNTT MANAGEMENT - BACKEND HOÀN CHỈNH
  * Cập nhật: 01/03/2026
  * Sửa lỗi phần tìm kiếm phân quyền (Quyền TEACHER)
  * =================================================================
@@ -456,8 +456,8 @@ function updateUser(email, u) {
         if (String(data[i][0]).toLowerCase() === email.toLowerCase()) {
             sheet.getRange(i + 1, 1, 1, 4).setValues([[email, u.role, u.fullName || '', u.assignedClasses || '']]);
             try {
-                MailApp.sendEmail(email, "[TNTT Kim Thành] Cập nhật quyền truy cập",
-                    "Xin chào " + (u.fullName || email) + ",\n\nTài khoản của bạn vừa được cập nhật vai trò: " + u.role + ".\nVui lòng tải lại trang để áp dụng.\n\nTrân trọng,\nHệ thống TNTT Kim Thành");
+                MailApp.sendEmail(email, "[TNTT Management] Cập nhật quyền truy cập",
+                    "Xin chào " + (u.fullName || email) + ",\n\nTài khoản của bạn vừa được cập nhật vai trò: " + u.role + ".\nVui lòng tải lại trang để áp dụng.\n\nTrân trọng,\nHệ thống TNTT Management");
             } catch (mailErr) { }
             clearDashboardCache();
             return { success: true };
