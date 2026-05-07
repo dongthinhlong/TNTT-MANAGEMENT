@@ -1,0 +1,5 @@
+{
+  "name": "TNTT Student Manager",
+  "description": "A modern React dashboard for managing TNTT students, grades, and statistics linked to Google Sheets.",
+  "requestFramePermissions": []
+}
