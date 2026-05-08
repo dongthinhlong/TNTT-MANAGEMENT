@@ -58,7 +58,7 @@ Dự án này sử dụng Google Apps Script làm Backend. Để hệ thống ho
 2. Tìm biến `GAS_API_URL`.
 3. Thay thế bằng URL Web App mà bạn đã triển khai từ Google Apps Script.
 
-**Lưu ý:** Mã nguồn backend nằm trong thư mục `/gas/backend_multi_year.js`. Bạn có thể copy code này dán vào dự án App Script của mình.
+**Lưu ý:** Mã nguồn backend nằm trong thư mục `/gas/backend.js`. Bạn có thể copy code này dán vào dự án App Script của mình.
 
 ---
 
@@ -78,13 +78,13 @@ Bạn cần tạo Client ID riêng để chức năng đăng nhập Google hoạ
 ### 2. Cấu hình Quyền Quản trị (GAS Backend)
 Đây là phần trả lời cho câu hỏi về "cài đặt tài khoản":
 - Mở file `gas/backend_multi_year.js`.
-- Tại dòng 33, thay đổi `ADMIN_EMAIL = 'dongthinhlong@gmail.com'` thành **Email của bạn**. Chỉ email này mới có quyền vào mục "Hệ thống" và "Cấu hình năm học".
+- Tại dòng 33, thay đổi `ADMIN_EMAIL = 'your-email@gmail.com'` thành **Email của bạn**. Chỉ email này mới có quyền vào mục "Hệ thống" và "Cấu hình năm học".
 
 ### 3. Cấu hình Cơ sở dữ liệu (Google Sheets)
 - Tạo một file Google Sheets mới trên Drive của bạn.
 - Đảm bảo file có các Sheet (Tab) tên: `Students`, `Grades`, `Users`, `Notifications`, `Attendance`.
 - Lấy ID của file Google Sheet (nằm trên thanh địa chỉ URL).
-- Trong file `gas/backend_multi_year.js`, tại hàm `getDatabaseMap()`, hãy thay ID mặc định bằng ID file Sheet bạn vừa tạo.
+- Trong file `gas/backend.js`, tại hàm `getDatabaseMap()`, hãy thay ID mặc định bằng ID file Sheet bạn vừa tạo.
 
 ### 4. Triển khai Web App
 - Trong trình soạn thảo Google Apps Script, nhấn **Deploy > New Deployment**.

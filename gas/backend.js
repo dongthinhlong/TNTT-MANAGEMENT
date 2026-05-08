@@ -9,8 +9,8 @@
 // ========================a========================================
 // 1. CẤU HÌNH
 // ================================================================
-const SPREADSHEET_ID = '1FmyVeIq-D6tlFBtEil_gPH2vK-6mCLqsOzVeQTtbtzQ';
-const ADMIN_EMAIL = 'dongthinhlong@gmail.com';
+const SPREADSHEET_ID = 'YOUR_SPREADSHEET_ID_HERE';
+const ADMIN_EMAIL = 'your-admin-email@gmail.com';
 const SHEET_STUDENTS = 'Students';
 const SHEET_GRADES = 'Grades';
 const SHEET_USERS = 'Users';
@@ -103,7 +103,7 @@ function safeSheet(name) {
     return sheet;
 }
 
-function getCurrentUserEmail() { return _CURRENT_USER_EMAIL || "anonymous@gmail.com"; }
+function getCurrentUserEmail() { return _CURRENT_USER_EMAIL || "your-email@gmail.com"; }
 
 function nowVN() {
     return Utilities.formatDate(new Date(), 'Asia/Ho_Chi_Minh', 'yyyy-MM-dd HH:mm:ss');
@@ -754,7 +754,7 @@ function exportGradesList(scope, className) {
 // 13. HÀM HỖ TRỢ
 // ================================================================
 function getExportFolder() {
-    var folderName = "TNTT_KIMTHANH_EXPORTS";
+    var folderName = "TNTT_MANAGEMENT_EXPORTS";
     var it = DriveApp.getFoldersByName(folderName);
     var folder = it.hasNext() ? it.next() : DriveApp.createFolder(folderName);
     folder.setSharing(DriveApp.Access.ANYONE_WITH_LINK, DriveApp.Permission.VIEW);

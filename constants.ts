@@ -18,4 +18,4 @@ export const ITEMS_PER_PAGE_SCORES = 20;
 
 // TODO: Thay thế bằng Client ID thực tế của bạn từ Google Cloud Console
 // Hướng dẫn: https://developers.google.com/identity/gsi/web/guides/get-google-api-clientid
-export const GOOGLE_CLIENT_ID = '572406573792-pc9uca8sbf0stimdi2vkbl8v2tfsai3j.apps.googleusercontent.com'; 
+export const GOOGLE_CLIENT_ID = 'YOUR_GOOGLE_CLIENT_ID.apps.googleusercontent.com'; 

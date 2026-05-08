@@ -3,12 +3,9 @@ import { ApiResponse, ClassSummary, OverallStats } from '../types';
 // IMPORTANT: Replace this with your deployed Google Apps Script Web App URL
 // Deploy Instructions: Deploy as Web App -> Execute as Me -> Access: Anyone
 
-// Link GAS Hoạt động (Mới nhất)
-const GAS_API_URL = 'https://script.google.com/macros/s/AKfycbzavkIpY6uDrjxeNYABGcZFekeWaTVwtMwVZu4naBi5v39JDiLyAuFIZ7nFCDLJrSDZ/exec';
+// Link GAS Hoạt động (Thay bằng link của bạn)
+const GAS_API_URL = 'YOUR_GOOGLE_APPS_SCRIPT_URL_HERE';
 
-// Link GAS Dự phòng (Các bản cũ)
-// const GAS_API_URL = 'https://script.google.com/macros/s/AKfycbxvTZSC0GDrzH7u_S0TXfJ6c3SPpnx03sJC6oVz6j8eFgyj7CnthIxgrQPDq9B-BqZV/exec';
-// const GAS_API_URL = 'https://script.google.com/macros/s/AKfycbyDbeOafRzySSFrBqYON2k19645aT6IeOZNgvL-16ZF27sX1uISLuZsJ647h6r2y89CIA/exec';
 async function callGasApi<T>(functionName: string, ...args: any[]): Promise<T> {
   // Ensure URL is configured
   if (GAS_API_URL.includes('XXX')) {
