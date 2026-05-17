@@ -22,3 +22,12 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+# OpenClaw Agent Files
+IDENTITY.md
+SOUL.md
+USER.md
+BOOTSTRAP.md
+HEARTBEAT.md
+TOOLS.md
+AGENTS.md
