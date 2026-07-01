@@ -18,7 +18,7 @@ import BadgePrinter from './components/BadgePrinter';
 import AcademicYearManager from './components/AcademicYearManager';
 import Hub from './components/Hub';
 import { api } from './services/gasApi';
-
+import { Toaster, toast } from 'react-hot-toast';
 // Helper to decode JWT from Google
 const parseJwt = (token: string) => {
   try {
@@ -99,63 +99,12 @@ const App: React.FC = () => {
         // CRITICAL: Save email specifically for GAS API calls
         localStorage.setItem('tntt_user_email', payload.email);
 
-        // Fetch Role from Backend
-        const rawRole = await api.getRole();
-        const role = (rawRole || 'GUEST').toUpperCase();
+        // Optimized: Fetch all necessary startup data in one single request
+        const initialData = await api.getInitialAppData();
+        const role = (initialData.role || 'GUEST').toUpperCase();
         setUserRole(role);
-        console.log("Logged in Role (Normalized):", role);
-
-        try {
-          const searchEmail = (payload.email || '').toLowerCase().trim();
-          let userData = null;
-
-          try {
-            userData = await api.findUserByEmail(searchEmail);
-          } catch (lookupError: any) {
-            console.error("Backend refused identification lookup:", lookupError.message);
-            // This happens if the userRole is TEACHER but the findUserByEmail function is ADMIN-only
-          }
-
-          if (!userData && role === 'ADMIN') {
-            try {
-              const allUsers = await api.getAllUsers();
-              userData = allUsers.find(u => {
-                const uEmail = (typeof u === 'object' ? (u.email || u[0]) : u).toString().toLowerCase().trim();
-                return uEmail === searchEmail;
-              });
-            } catch (err) { }
-          }
-
-          if (userData) {
-            if (Array.isArray(userData)) {
-              const classes = String(userData[3] || '');
-              console.log("Found assigned classes:", classes);
-              setAssignedClasses(classes);
-            } else {
-              const classes = String(userData.assignedClasses || userData['Phân lớp'] || userData.phanLop || '');
-              console.log("Found assigned classes:", classes);
-              setAssignedClasses(classes);
-            }
-          } else if (role === 'TEACHER') {
-            // FALLBACK FOR TEACHERS whose backend lookup was rejected:
-            // Try relying on getAllClassesWithPermission if the backend provides it
-            try {
-              const permClasses = await api.getAllClassesWithPermission();
-              const classesString = Array.isArray(permClasses) ? permClasses.join(',') : String(permClasses);
-              console.log("Fallback: using getAllClassesWithPermission:", classesString);
-              setAssignedClasses(classesString);
-            } catch (permErr) {
-              console.warn("getAllClassesWithPermission also rejected/failed", permErr);
-              setAssignedClasses(''); // Will show warning in the UI
-            }
-          } else {
-            console.warn("User data record not found. Defaulting classes for:", role);
-            if (role === 'ADMIN') setAssignedClasses('ALL');
-          }
-        } catch (e) {
-          console.error("Critical identity setup error", e);
-          if (role === 'ADMIN') setAssignedClasses('ALL');
-        }
+        setAssignedClasses(initialData.assignedClasses || '');
+        console.log("Initial App Data loaded. Role:", role, "Classes:", initialData.assignedClasses);
 
         // Finalize login flow
         setIsDashboardActive(true);
@@ -168,7 +117,7 @@ const App: React.FC = () => {
           setActiveTab('hub');
         }
       } else {
-        alert('Không thể xác thực thông tin đăng nhập.');
+        toast.error('Không thể xác thực thông tin đăng nhập.');
       }
     } catch (e) {
       console.error("Login processing error", e);
@@ -211,7 +160,7 @@ const App: React.FC = () => {
         >
           ← Quay lại trang chủ
         </button>
-        <Login onLoginSuccess={handleLoginSuccess} onLoginFailure={() => alert('Đăng nhập thất bại')} />
+        <Login onLoginSuccess={handleLoginSuccess} onLoginFailure={() => toast.error('Đăng nhập thất bại')} />
       </div>
     );
   }
@@ -285,6 +234,7 @@ const App: React.FC = () => {
       userEmail={userEmail}
       onLogout={handleLogout}
     >
+      <Toaster position="top-right" toastOptions={{ duration: 3000, style: { background: '#333', color: '#fff', fontWeight: 'bold' } }} />
       {renderContent()}
     </Layout>
   );

@@ -8,8 +8,8 @@ import {
 import { RANKING_COLORS } from '../constants';
 import {
     RefreshCw, Users, TrendingUp, Award, BookOpen,
-    BarChart3, PieChart as PieIcon, Table as TableIcon,
-    Trophy, Medal, Target, ChevronRight
+    BarChart3, PieChart as PieIcon,
+    Trophy, Medal, Target, ChevronRight, Star
 } from 'lucide-react';
 
 interface DashboardProps {
@@ -49,10 +49,11 @@ const Dashboard: React.FC<DashboardProps> = ({ userRole = 'GUEST' }) => {
         const data = Object.values(classSummaries).map(cls => ({
             name: cls.className,
             avgScore: cls.averageScore !== 'N/A' ? parseFloat(cls.averageScore) : 0,
-            Giỏi: cls.rankings['Giỏi'] || 0,
-            Khá: cls.rankings['Khá'] || 0,
-            TB: cls.rankings['Trung bình'] || 0,
-            Yếu: cls.rankings['Yếu'] || 0,
+            'Xuất sắc': cls.rankings['Xuất sắc'] || 0,
+            'Giỏi': cls.rankings['Giỏi'] || 0,
+            'Khá': cls.rankings['Khá'] || 0,
+            'Trung bình': cls.rankings['Trung bình'] || 0,
+            'Yếu': cls.rankings['Yếu'] || 0,
             total: cls.totalStudents,
             hasScore: cls.studentsWithScores
         }));
@@ -96,30 +97,38 @@ const Dashboard: React.FC<DashboardProps> = ({ userRole = 'GUEST' }) => {
     const withScores = stats.studentsWithScores || 0;
     const completionRate = totalStudents > 0 ? ((withScores / totalStudents) * 100).toFixed(1) : "0.0";
 
+    const totalRated = Object.values(stats.rankings || {}).reduce((a, b) => a + b, 0);
+
     const rankingPieData = [
+        { name: 'Xuất sắc', value: stats.rankings?.['Xuất sắc'] || 0 },
         { name: 'Giỏi', value: stats.rankings?.['Giỏi'] || 0 },
         { name: 'Khá', value: stats.rankings?.['Khá'] || 0 },
         { name: 'Trung bình', value: stats.rankings?.['Trung bình'] || 0 },
         { name: 'Yếu', value: stats.rankings?.['Yếu'] || 0 },
-    ].filter(d => d.value > 0);
-
-    const percentageBarData = classData.map(cls => {
-        const totalRated = cls.Giỏi + cls.Khá + cls.TB + cls.Yếu;
-        const div = totalRated > 0 ? totalRated : 1;
-        return {
-            ...cls,
-            pctGiỏi: parseFloat(((cls.Giỏi / div) * 100).toFixed(1)),
-            pctKhá: parseFloat(((cls.Khá / div) * 100).toFixed(1)),
-            pctTB: parseFloat(((cls.TB / div) * 100).toFixed(1)),
-            pctYếu: parseFloat(((cls.Yếu / div) * 100).toFixed(1)),
-        };
-    });
+    ].filter(d => d.value > 0).map(d => ({
+        ...d,
+        pct: totalRated > 0 ? ((d.value / totalRated) * 100).toFixed(1) : '0.0'
+    }));
 
     const leaderboardData = [...classData]
         .filter(c => c.avgScore > 0)
         .sort((a, b) => b.avgScore - a.avgScore);
 
     const hasRankingData = rankingPieData.length > 0;
+
+    const percentageBarData = classData.map(cls => {
+        const totalRated = (cls['Xuất sắc'] || 0) + (cls['Giỏi'] || 0) + (cls['Khá'] || 0) + (cls['Trung bình'] || 0) + (cls['Yếu'] || 0);
+        const div = totalRated > 0 ? totalRated : 1;
+        return {
+            ...cls,
+            pctXuatSac: parseFloat((((cls['Xuất sắc'] || 0) / div) * 100).toFixed(1)),
+            pctGiỏi: parseFloat((((cls['Giỏi'] || 0) / div) * 100).toFixed(1)),
+            pctKhá: parseFloat((((cls['Khá'] || 0) / div) * 100).toFixed(1)),
+            pctTB: parseFloat((((cls['Trung bình'] || 0) / div) * 100).toFixed(1)),
+            pctYếu: parseFloat((((cls['Yếu'] || 0) / div) * 100).toFixed(1)),
+        };
+    });
+
     const hasClassData = classData.length > 0;
 
     return (
@@ -144,7 +153,7 @@ const Dashboard: React.FC<DashboardProps> = ({ userRole = 'GUEST' }) => {
             </div>
 
             {/* 2. KPI Grid */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-6">
                 <KPICard
                     title="Sĩ số tổng"
                     value={totalStudents}
@@ -157,6 +166,13 @@ const Dashboard: React.FC<DashboardProps> = ({ userRole = 'GUEST' }) => {
                     value={(!stats.averageScore || stats.averageScore === 'N/A') ? '--' : stats.averageScore}
                     subtitle="Trung bình tất cả học sinh"
                     icon={TrendingUp}
+                    color="primary"
+                />
+                <KPICard
+                    title="Học sinh Xuất sắc"
+                    value={stats.rankings?.['Xuất sắc'] || 0}
+                    subtitle={`Chiếm ${(totalStudents > 0 ? ((stats.rankings?.['Xuất sắc'] || 0) / totalStudents * 100).toFixed(1) : 0)}% tổng số`}
+                    icon={Star}
                     color="purple"
                 />
                 <KPICard
@@ -192,11 +208,13 @@ const Dashboard: React.FC<DashboardProps> = ({ userRole = 'GUEST' }) => {
                                     <Pie
                                         data={rankingPieData}
                                         cx="50%" cy="50%"
-                                        innerRadius={70}
-                                        outerRadius={110}
-                                        paddingAngle={8}
+                                        innerRadius={60}
+                                        outerRadius={100}
+                                        paddingAngle={6}
                                         dataKey="value"
                                         stroke="none"
+                                        label={({ name, pct }: any) => `${pct}%`}
+                                        labelLine={{ stroke: '#cbd5e1', strokeWidth: 1.5 }}
                                     >
                                         {rankingPieData.map((entry, index) => (
                                             <Cell key={`cell-${index}`} fill={RANKING_COLORS[entry.name] || '#ccc'} className="hover:opacity-80 transition-opacity outline-none" />
@@ -205,7 +223,7 @@ const Dashboard: React.FC<DashboardProps> = ({ userRole = 'GUEST' }) => {
                                     <Tooltip content={<CustomTooltip type="pie" />} />
                                     <Legend
                                         verticalAlign="bottom"
-                                        height={36}
+                                        height={40}
                                         iconType="circle"
                                         formatter={(value) => <span className="text-sm font-bold text-slate-600">{value}</span>}
                                     />
@@ -247,7 +265,8 @@ const Dashboard: React.FC<DashboardProps> = ({ userRole = 'GUEST' }) => {
                                         unit="%"
                                     />
                                     <Tooltip cursor={{ fill: '#f8fafc', radius: 10 }} content={<CustomTooltip type="bar" />} />
-                                    <Bar dataKey="pctGiỏi" name="Giỏi" stackId="a" fill={RANKING_COLORS['Giỏi']} barSize={24} radius={[0, 0, 0, 0]} />
+                                    <Bar dataKey="pctXuatSac" name="Xuất sắc" stackId="a" fill={RANKING_COLORS['Xuất sắc']} barSize={24} radius={[0, 0, 0, 0]} />
+                                    <Bar dataKey="pctGiỏi" name="Giỏi" stackId="a" fill={RANKING_COLORS['Giỏi']} />
                                     <Bar dataKey="pctKhá" name="Khá" stackId="a" fill={RANKING_COLORS['Khá']} />
                                     <Bar dataKey="pctTB" name="Trung bình" stackId="a" fill={RANKING_COLORS['Trung bình']} />
                                     <Bar dataKey="pctYếu" name="Yếu" stackId="a" fill={RANKING_COLORS['Yếu']} radius={[6, 6, 0, 0]} />
@@ -328,77 +347,6 @@ const Dashboard: React.FC<DashboardProps> = ({ userRole = 'GUEST' }) => {
                 )}
             </div>
 
-            {/* 5. Detailed Metric Table */}
-            <div className="bg-slate-900 p-1 rounded-[3rem] shadow-2xl overflow-hidden shadow-blue-900/10">
-                <div className="bg-slate-900 p-8 flex items-center justify-between">
-                    <div className="flex items-center gap-3">
-                        <div className="p-3 bg-white/5 rounded-2xl text-white outline outline-white/10"><TableIcon className="h-6 w-6" /></div>
-                        <h3 className="text-xl font-black text-white tracking-tight text-slate-100">Dữ liệu chi tiết theo lớp</h3>
-                    </div>
-                </div>
-
-                <div className="bg-white rounded-[2.5rem] m-1 overflow-hidden">
-                    {hasClassData ? (
-                        <div className="overflow-x-auto custom-scrollbar">
-                            <table className="w-full text-sm text-left border-collapse">
-                                <thead>
-                                    <tr className="bg-slate-50 border-b border-slate-100">
-                                        <th className="px-8 py-5 font-black text-slate-400 uppercase tracking-widest text-[10px]">Lớp học</th>
-                                        <th className="px-4 py-5 font-black text-slate-400 uppercase tracking-widest text-[10px] text-center">Sĩ số</th>
-                                        <th className="px-4 py-5 font-black text-slate-400 uppercase tracking-widest text-[10px] text-center">Hoàn thành</th>
-                                        <th className="px-4 py-5 font-black text-slate-400 uppercase tracking-widest text-[10px] text-center">Avg Score</th>
-                                        <th className="px-4 py-5 font-black text-green-600 uppercase tracking-widest text-[10px] text-center">Giỏi</th>
-                                        <th className="px-4 py-5 font-black text-blue-600 uppercase tracking-widest text-[10px] text-center">Khá</th>
-                                        <th className="px-4 py-5 font-black text-yellow-600 uppercase tracking-widest text-[10px] text-center">TB</th>
-                                        <th className="px-4 py-5 font-black text-red-600 uppercase tracking-widest text-[10px] text-center">Yếu</th>
-                                    </tr>
-                                </thead>
-                                <tbody className="divide-y divide-slate-50">
-                                    {classData.map((cls) => (
-                                        <tr key={cls.name} className="hover:bg-blue-50/30 transition-colors group">
-                                            <td className="px-8 py-4">
-                                                <div className="flex items-center gap-3 font-bold text-slate-800 text-base">
-                                                    {cls.name}
-                                                    <ChevronRight className="h-4 w-4 text-slate-300 opacity-0 group-hover:opacity-100 transition-all transform translate-x-0 group-hover:translate-x-1" />
-                                                </div>
-                                            </td>
-                                            <td className="px-4 py-4 text-center text-slate-500 font-bold">{cls.total}</td>
-                                            <td className="px-4 py-4 text-center">
-                                                <div className="inline-flex items-center px-3 py-1 bg-slate-100 rounded-full text-[11px] font-bold text-slate-600">
-                                                    {cls.hasScore} HS
-                                                </div>
-                                            </td>
-                                            <td className="px-4 py-4 text-center">
-                                                <span className={`inline-flex items-center px-3 py-1 rounded-lg text-sm font-black transition-all ${cls.avgScore >= 8 ? 'bg-green-100 text-green-700 shadow-sm shadow-green-200/50' :
-                                                    cls.avgScore >= 6.5 ? 'bg-blue-100 text-blue-700 shadow-sm shadow-blue-200/50' :
-                                                        cls.avgScore >= 5 ? 'bg-yellow-100 text-yellow-700' :
-                                                            cls.avgScore > 0 ? 'bg-red-100 text-red-700' : 'bg-slate-100 text-slate-300'
-                                                    }`}>
-                                                    {cls.avgScore > 0 ? cls.avgScore.toFixed(2) : '--'}
-                                                </span>
-                                            </td>
-                                            <td className="px-4 py-4 text-center">
-                                                {cls.Giỏi > 0 ? <span className="font-extrabold text-green-600">{cls.Giỏi}</span> : <span className="text-slate-200">-</span>}
-                                            </td>
-                                            <td className="px-4 py-4 text-center">
-                                                {cls.Khá > 0 ? <span className="font-extrabold text-blue-600">{cls.Khá}</span> : <span className="text-slate-200">-</span>}
-                                            </td>
-                                            <td className="px-4 py-4 text-center">
-                                                {cls.TB > 0 ? <span className="font-extrabold text-yellow-600">{cls.TB}</span> : <span className="text-slate-200">-</span>}
-                                            </td>
-                                            <td className="px-4 py-4 text-center">
-                                                {cls.Yếu > 0 ? <span className="font-extrabold text-red-600">{cls.Yếu}</span> : <span className="text-slate-200">-</span>}
-                                            </td>
-                                        </tr>
-                                    ))}
-                                </tbody>
-                            </table>
-                        </div>
-                    ) : (
-                        <div className="text-center py-10 text-slate-300 font-medium">Chưa thể tải bảng chi tiết</div>
-                    )}
-                </div>
-            </div>
         </div>
     );
 };
@@ -447,6 +395,7 @@ const CustomTooltip = ({ active, payload, label, type }: any) => {
                         const isPercentage = type === 'bar';
                         const rawCountKey = entry.name;
                         const rawCount = entry.payload[rawCountKey];
+                        const pct = entry.payload?.pct;
 
                         return (
                             <div key={index} className="flex items-center justify-between">
@@ -458,6 +407,9 @@ const CustomTooltip = ({ active, payload, label, type }: any) => {
                                     <span>{typeof entry.value === 'number' ? (isPercentage ? `${entry.value}%` : entry.value) : entry.value}</span>
                                     {isPercentage && rawCount !== undefined && (
                                         <span className="text-[10px] text-slate-500">({rawCount} HS)</span>
+                                    )}
+                                    {pct && !isPercentage && (
+                                        <span className="text-[10px] text-slate-500">({pct}%)</span>
                                     )}
                                 </div>
                             </div>

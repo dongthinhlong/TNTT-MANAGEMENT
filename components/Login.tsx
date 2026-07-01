@@ -104,7 +104,7 @@ const Login: React.FC<LoginProps> = ({ onLoginSuccess, onLoginFailure }) => {
         </div>
 
         <div className="mt-8 text-center text-slate-400 text-xs font-bold uppercase tracking-widest">
-          &copy; {new Date().getFullYear()} TNTT Management
+          &copy; {new Date().getFullYear()} TNTT Management Management
         </div>
       </div>
 

@@ -176,7 +176,8 @@ const StudentProfile: React.FC<StudentProfileProps> = ({
     let rankColor = "text-slate-500";
     let rankBg = "bg-slate-100";
 
-    if (sAvg >= 8) { rankColor = "text-green-600"; rankBg = "bg-green-50"; }
+    if (sAvg >= 9) { rankColor = "text-purple-600"; rankBg = "bg-purple-50"; }
+    else if (sAvg >= 8) { rankColor = "text-green-600"; rankBg = "bg-green-50"; }
     else if (sAvg >= 6.5) { rankColor = "text-blue-600"; rankBg = "bg-blue-50"; }
     else if (sAvg >= 5) { rankColor = "text-yellow-600"; rankBg = "bg-yellow-50"; }
     else if (sAvg > 0) { rankColor = "text-red-600"; rankBg = "bg-red-50"; }

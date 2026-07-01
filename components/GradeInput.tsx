@@ -372,6 +372,7 @@ const GradeInput: React.FC<GradeInputProps> = ({ userRole, assignedClasses = '' 
                                         })}
                                         <td className="px-8 py-6 text-center">
                                             <div className={`inline-flex items-center justify-center w-14 h-11 rounded-2xl font-black text-lg shadow-sm border-2 ${isNA ? 'bg-slate-50 text-slate-300 border-transparent' :
+                                                avgNum >= 9 ? 'bg-purple-50 text-purple-600 border-purple-100' :
                                                 avgNum >= 8 ? 'bg-green-50 text-green-600 border-green-100' :
                                                     avgNum >= 6.5 ? 'bg-blue-50 text-blue-600 border-blue-100' :
                                                         avgNum >= 5 ? 'bg-yellow-50 text-yellow-600 border-yellow-100' :

@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Html5QrcodeScanner, Html5QrcodeScanType } from 'html5-qrcode';
-import { ScanLine, FileText, CheckCircle, AlertCircle, Keyboard, Loader, HelpCircle, X, Info } from 'lucide-react';
+import { ScanLine, FileText, CheckCircle, AlertCircle, Keyboard, Loader, HelpCircle, X, Info, Download, FileSpreadsheet } from 'lucide-react';
 import AttendanceReport from './AttendanceReport';
 import { api } from '../services/gasApi';
 
@@ -9,7 +9,7 @@ interface AttendanceScannerProps {
 }
 
 const AttendanceScanner: React.FC<AttendanceScannerProps> = ({ userRole }) => {
-  const [activeSubTab, setActiveSubTab] = useState<'scan' | 'report'>('scan');
+  const [activeSubTab, setActiveSubTab] = useState<'scan' | 'report' | 'export'>('scan');
   const [scannerStatus, setScannerStatus] = useState<'idle' | 'scanning' | 'success' | 'error'>('idle');
   const [errorMessage, setErrorMessage] = useState<string>('');
   const [lastScannedId, setLastScannedId] = useState<string>('');
@@ -17,6 +17,10 @@ const AttendanceScanner: React.FC<AttendanceScannerProps> = ({ userRole }) => {
   const [manualMode, setManualMode] = useState(false); // MANUAL TEST MODE
   const [manualId, setManualId] = useState('');
   const [showHelp, setShowHelp] = useState(false);
+  const [exportDates, setExportDates] = useState({
+    start: new Date().toISOString().split('T')[0],
+    end: new Date().toISOString().split('T')[0]
+  });
 
   // ⚡ TỐI ƯU: Load bản đồ học sinh để hiện tên tức thì
   const [studentMap, setStudentMap] = useState<Map<string, { name: string, className: string }>>(new Map());
@@ -273,6 +277,24 @@ const AttendanceScanner: React.FC<AttendanceScannerProps> = ({ userRole }) => {
     setTimeout(() => manualInputRef.current?.focus(), 100);
   };
 
+  const [exportLoading, setExportLoading] = useState(false);
+  const handleExportExcel = async () => {
+    setExportLoading(true);
+    try {
+      const result = await api.exportAttendanceReport(exportDates.start, exportDates.end);
+      if (result.success && result.downloadUrl) {
+        window.open(result.downloadUrl, '_blank');
+      } else {
+        alert(result.message || 'Lỗi xuất file');
+      }
+    } catch (e) {
+      console.error(e);
+      alert('Lỗi hệ thống');
+    } finally {
+      setExportLoading(false);
+    }
+  };
+
   return (
     <div className="bg-white rounded-3xl shadow-sm border border-slate-100 p-6 relative">
       <style>{`
@@ -431,6 +453,14 @@ const AttendanceScanner: React.FC<AttendanceScannerProps> = ({ userRole }) => {
           >
             <FileText className="h-4 w-4" /> Báo cáo
           </button>
+          {userRole === 'ADMIN' && (
+            <button
+              onClick={() => setActiveSubTab('export')}
+              className={`flex-1 md:flex-none px-4 py-2 rounded-lg font-bold text-sm flex items-center justify-center gap-2 transition-all ${activeSubTab === 'export' ? 'bg-white text-green-600 shadow-sm' : 'text-slate-500 hover:text-slate-700'}`}
+            >
+              <FileSpreadsheet className="h-4 w-4" /> Xuất Excel
+            </button>
+          )}
         </div>
       </div>
 
@@ -640,6 +670,72 @@ const AttendanceScanner: React.FC<AttendanceScannerProps> = ({ userRole }) => {
 
       {activeSubTab === 'report' && (
         <AttendanceReport />
+      )}
+
+      {activeSubTab === 'export' && (
+        <div className="animate-in fade-in slide-in-from-bottom-4 duration-500">
+            <div className="max-w-2xl mx-auto bg-white rounded-[2.5rem] shadow-xl shadow-slate-200/50 border border-slate-100 p-8 md:p-12">
+                <div className="flex items-center gap-6 mb-10">
+                    <div className="p-5 bg-green-50 text-green-600 rounded-[2rem] shadow-inner">
+                        <FileSpreadsheet className="h-10 w-10" />
+                    </div>
+                    <div>
+                        <h2 className="text-2xl font-black text-slate-900 tracking-tight">Xuất Báo Cáo Điểm Danh</h2>
+                        <p className="text-slate-400 font-bold text-xs uppercase tracking-widest mt-1">Kết xuất dữ liệu chuyên cần sang Excel</p>
+                    </div>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+                    <div className="space-y-2">
+                        <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Từ ngày</label>
+                        <input
+                            type="date"
+                            value={exportDates.start}
+                            onChange={(e) => setExportDates(prev => ({ ...prev, start: e.target.value }))}
+                            className="w-full p-4 bg-slate-50 border-2 border-slate-100 rounded-2xl font-black text-slate-700 focus:outline-none focus:border-green-500 focus:ring-4 focus:ring-green-50 transition-all"
+                        />
+                    </div>
+                    <div className="space-y-2">
+                        <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Đến ngày</label>
+                        <input
+                            type="date"
+                            value={exportDates.end}
+                            onChange={(e) => setExportDates(prev => ({ ...prev, end: e.target.value }))}
+                            className="w-full p-4 bg-slate-50 border-2 border-slate-100 rounded-2xl font-black text-slate-700 focus:outline-none focus:border-green-500 focus:ring-4 focus:ring-green-50 transition-all"
+                        />
+                    </div>
+                </div>
+
+                <div className="p-5 bg-blue-50 rounded-[1.5rem] border border-blue-100 flex items-start gap-4 mb-10">
+                    <Info className="h-6 w-6 text-blue-500 shrink-0 mt-0.5" />
+                    <p className="text-xs font-bold text-blue-700 leading-relaxed uppercase tracking-tight">
+                        Lưu ý: Hệ thống sẽ thống kê tổng hợp số buổi có mặt của từng học sinh trong khoảng thời gian bạn đã chọn.
+                    </p>
+                </div>
+
+                <button
+                    onClick={handleExportExcel}
+                    disabled={exportLoading}
+                    className="w-full py-5 bg-green-500 hover:bg-green-600 text-white font-black rounded-[2rem] transition-all active:scale-95 shadow-xl shadow-green-200 flex items-center justify-center gap-3 disabled:opacity-50"
+                >
+                    {exportLoading ? (
+                        <>
+                            <Loader className="h-6 w-6 animate-spin" />
+                            ĐANG TRÍCH XUẤT DỮ LIỆU...
+                        </>
+                    ) : (
+                        <>
+                            <Download className="h-6 w-6" />
+                            TẢI FILE EXCEL NGAY
+                        </>
+                    )}
+                </button>
+                
+                <div className="mt-8 text-center">
+                    <p className="text-slate-400 text-[10px] font-black uppercase tracking-[0.2em]">Hệ thống quản lý điểm danh · TNTT Management</p>
+                </div>
+            </div>
+        </div>
       )}
     </div>
   );

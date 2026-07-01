@@ -3,7 +3,7 @@ import { Database, ExternalLink, ShieldAlert, Info, RefreshCw } from 'lucide-rea
 
 const DatabaseEditor: React.FC = () => {
     // Link Google Sheet của bạn
-    const SHEET_URL = "https://docs.google.com/spreadsheets/d/1FmyVeIq-D6tlFBtEil_gPH2vK-6mCLqsOzVeQTtbtzQ/edit";
+    const SHEET_URL = "https://docs.google.com/spreadsheets/d/YOUR_SPREADSHEET_ID_HERE/edit";
 
     const [loading, setLoading] = useState(true);
 

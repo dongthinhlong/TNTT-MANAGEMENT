@@ -3,13 +3,13 @@ import { ApiResponse, ClassSummary, OverallStats } from '../types';
 // IMPORTANT: Replace this with your deployed Google Apps Script Web App URL
 // Deploy Instructions: Deploy as Web App -> Execute as Me -> Access: Anyone
 
-// Link GAS Hoạt động (Thay bằng link của bạn)
-const GAS_API_URL = 'YOUR_GOOGLE_APPS_SCRIPT_URL_HERE';
+// Link GAS Hoạt động (Ưu tiên từ biến môi trường, fallback về URL mặc định)
+const GAS_API_URL = import.meta.env.VITE_GAS_API_URL || 'YOUR_GOOGLE_APPS_SCRIPT_URL_HERE';
 
 async function callGasApi<T>(functionName: string, ...args: any[]): Promise<T> {
   // Ensure URL is configured
-  if (GAS_API_URL.includes('XXX')) {
-    throw new Error("API URL is not configured. Please update services/gasApi.ts");
+  if (GAS_API_URL === 'YOUR_GOOGLE_APPS_SCRIPT_URL_HERE') {
+    throw new Error("API URL is not configured. Please set VITE_GAS_API_URL in .env or update services/gasApi.ts");
   }
 
   // Retrieve the logged-in email to emulate session for GAS "Execute as Me" deployments
@@ -62,6 +62,7 @@ async function callGasApi<T>(functionName: string, ...args: any[]): Promise<T> {
 export const api = {
   getRole: () => callGasApi<string>('getRole'),
   getCurrentUserEmail: () => callGasApi<string>('getCurrentUserEmail'),
+  getInitialAppData: () => callGasApi<any>('getInitialAppData'),
   getAllStudentsWithPermission: () => callGasApi<any[]>('getAllStudentsWithPermission'),
   getAllClassesWithPermission: () => callGasApi<string[]>('getAllClassesWithPermission'),
   getAllClasses: () => callGasApi<string[]>('getAllClasses'),
@@ -85,6 +86,7 @@ export const api = {
 
   exportStudentList: (type: string, className?: string) => callGasApi<ApiResponse<any>>('exportStudentList', type, className),
   exportGradesList: (type: string, className?: string) => callGasApi<ApiResponse<any>>('exportGradesList', type, className),
+  exportAttendanceReport: (startDate?: string, endDate?: string) => callGasApi<ApiResponse<any>>('exportAttendanceReport', startDate, endDate),
   getAttendanceReport: (startDate?: string, endDate?: string) => callGasApi<any[][]>('getAttendanceReport', startDate, endDate),
   getTodayScannedIds: () => callGasApi<string[]>('getTodayScannedIds'),
   recordAttendance: (studentId: string) => callGasApi<any>('recordAttendance', studentId),

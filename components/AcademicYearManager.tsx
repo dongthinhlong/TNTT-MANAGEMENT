@@ -160,7 +160,7 @@ const AcademicYearManager: React.FC<AcademicYearManagerProps> = ({ userRole }) =
               <label className="text-xs font-bold text-blue-800 uppercase tracking-wide block mb-1">Google Sheet ID</label>
               <input
                 type="text"
-                placeholder="1FmyVeIq-D6tlFBtEil_g..."
+                placeholder="YOUR_SPREADSHEET_ID_HERE..."
                 value={newId}
                 onChange={e => setNewId(e.target.value)}
                 required

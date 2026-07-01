@@ -88,7 +88,12 @@ const UserManagement: React.FC = () => {
         let finalClasses = '';
         if (formData.role === 'ADMIN') finalClasses = 'ALL';
         else if (formData.role === 'TEACHER') {
-            finalClasses = selectedClasses.join(',');
+            if (selectedClasses.length === allClasses.length && allClasses.length > 0) {
+                finalClasses = 'ALL';
+            } else {
+                finalClasses = selectedClasses.join(',');
+            }
+            
             if (!finalClasses) {
                 alert('Giáo viên cần được phân công ít nhất 1 lớp.');
                 return;
@@ -237,14 +242,22 @@ const UserManagement: React.FC = () => {
                                                 </span>
                                             ) : user.role === 'TEACHER' ? (
                                                 <div className="flex flex-wrap gap-1.5">
-                                                    {user.assignedClasses.split(',').filter(Boolean).slice(0, 3).map(c =>
-                                                        <span key={c} className="bg-white text-blue-600 px-2 py-0.5 rounded-lg border border-blue-50 text-[10px] font-black uppercase tracking-tighter shadow-sm">{c}</span>
-                                                    )}
-                                                    {user.assignedClasses.split(',').filter(Boolean).length > 3 && (
-                                                        <span className="text-slate-300 font-black text-[10px] self-center ml-1">+{user.assignedClasses.split(',').filter(Boolean).length - 3} KHÁC</span>
-                                                    )}
-                                                    {user.assignedClasses.split(',').filter(Boolean).length === 0 && (
-                                                        <span className="text-slate-300 italic text-xs">Chưa gán lớp</span>
+                                                    {user.assignedClasses === 'ALL' ? (
+                                                        <span className="bg-white text-blue-600 px-2 py-0.5 rounded-lg border border-blue-50 text-[10px] font-black uppercase tracking-widest shadow-sm">
+                                                            Tất cả lớp
+                                                        </span>
+                                                    ) : (
+                                                        <>
+                                                            {user.assignedClasses.split(',').filter(Boolean).slice(0, 3).map(c =>
+                                                                <span key={c} className="bg-white text-blue-600 px-2 py-0.5 rounded-lg border border-blue-50 text-[10px] font-black uppercase tracking-tighter shadow-sm">{c}</span>
+                                                            )}
+                                                            {user.assignedClasses.split(',').filter(Boolean).length > 3 && (
+                                                                <span className="text-slate-300 font-black text-[10px] self-center ml-1">+{user.assignedClasses.split(',').filter(Boolean).length - 3} KHÁC</span>
+                                                            )}
+                                                            {user.assignedClasses.split(',').filter(Boolean).length === 0 && (
+                                                                <span className="text-slate-300 italic text-xs">Chưa gán lớp</span>
+                                                            )}
+                                                        </>
                                                     )}
                                                 </div>
                                             ) : '-'}
@@ -340,7 +353,9 @@ const UserManagement: React.FC = () => {
                                 {formData.role === 'TEACHER' && (
                                     <div className="bg-indigo-50/50 p-6 rounded-[2rem] border border-indigo-100 animate-in fade-in slide-in-from-top-2 duration-300">
                                         <div className="flex justify-between items-center mb-6 px-1">
-                                            <label className="text-[10px] font-black text-indigo-700 uppercase tracking-widest">Phân lớp phụ trách</label>
+                                            <div className="flex items-center gap-2">
+                                                <label className="text-[10px] font-black text-indigo-700 uppercase tracking-widest">Phân lớp phụ trách</label>
+                                            </div>
                                             <button
                                                 type="button"
                                                 onClick={handleSelectAllClasses}

@@ -4,7 +4,7 @@ import {
     Tooltip as RechartsTooltip, ResponsiveContainer,
     LineChart, Line, Legend
 } from 'recharts';
-import { Users, FileText, TrendingUp, Calendar, AlertCircle, ChevronLeft, ChevronRight } from 'lucide-react';
+import { Users, FileText, TrendingUp, Calendar, AlertCircle, ChevronLeft, ChevronRight, FileSpreadsheet, Loader2 } from 'lucide-react';
 import { api } from '../services/gasApi';
 
 // ================================================================
@@ -64,11 +64,12 @@ const AttendanceReport: React.FC = () => {
     const [reports, setReports] = useState<any[]>([]);
     const [studentsList, setStudentsList] = useState<any[]>([]);
     const [loading, setLoading] = useState(false);
+    const [exportLoading, setExportLoading] = useState(false);
     const [error, setError] = useState('');
 
     // === BỘ LỌC ===
     // === BỘ LỌC ===
-    const [viewMode, setViewMode] = useState<'today' | 'day' | 'week' | 'month' | 'custom' | 'all'>('month');
+    const [viewMode, setViewMode] = useState<'today' | 'day' | 'week' | 'month' | 'custom' | 'all'>('week');
     const [weekOffset, setWeekOffset] = useState(0);
     const [monthOffset, setMonthOffset] = useState(0);
     const [specificDate, setSpecificDate] = useState(toISODate(new Date()));
@@ -156,6 +157,47 @@ const AttendanceReport: React.FC = () => {
         };
         loadReport();
     }, [viewMode, weekOffset, monthOffset, specificDate, startDate, endDate]);
+
+    const handleExportExcel = async () => {
+        setExportLoading(true);
+        try {
+            let start: string | undefined;
+            let end: string | undefined;
+            const now = new Date();
+
+            if (viewMode === 'today') {
+                start = end = toISODate(now);
+            } else if (viewMode === 'day') {
+                start = end = specificDate;
+            } else if (viewMode === 'week') {
+                const ws = getWeekStart(now);
+                ws.setDate(ws.getDate() + (weekOffset * 7));
+                const we = new Date(ws);
+                we.setDate(ws.getDate() + 6);
+                start = toISODate(ws);
+                end = toISODate(we);
+            } else if (viewMode === 'month') {
+                const ms = new Date(now.getFullYear(), now.getMonth() + monthOffset, 1);
+                const me = new Date(now.getFullYear(), now.getMonth() + monthOffset + 1, 0);
+                start = toISODate(ms);
+                end = toISODate(me);
+            } else if (viewMode === 'custom') {
+                start = startDate;
+                end = endDate;
+            }
+
+            const result = await api.exportAttendanceReport(start, end);
+            if (result.success && result.downloadUrl) {
+                window.open(result.downloadUrl, '_blank');
+            } else {
+                alert(result.message || 'Lỗi khi xuất file Excel');
+            }
+        } catch (err: any) {
+            alert('Lỗi hệ thống: ' + err.message);
+        } finally {
+            setExportLoading(false);
+        }
+    };
 
     // Build student map
     const sMap = useMemo(() => {
@@ -528,9 +570,23 @@ const AttendanceReport: React.FC = () => {
                         <h3 className="font-black text-slate-800 mb-6 flex items-center gap-2 text-base">
                             <FileText className="h-5 w-5 text-blue-600" />
                             Danh sách chi tiết
-                            <span className="ml-auto text-xs font-bold text-slate-400 bg-slate-100 px-3 py-1 rounded-full">
-                                {filteredRows.length} lượt
-                            </span>
+                            <div className="ml-auto flex items-center gap-3">
+                                <button
+                                    onClick={handleExportExcel}
+                                    disabled={exportLoading || filteredRows.length === 0}
+                                    className="flex items-center gap-2 px-4 py-2 bg-green-50 text-green-700 rounded-xl font-black text-xs hover:bg-green-100 transition-all border border-green-100 disabled:opacity-50 disabled:cursor-not-allowed"
+                                >
+                                    {exportLoading ? (
+                                        <Loader2 className="h-4 w-4 animate-spin" />
+                                    ) : (
+                                        <FileSpreadsheet className="h-4 w-4" />
+                                    )}
+                                    Xuất Excel
+                                </button>
+                                <span className="hidden sm:inline-flex text-xs font-bold text-slate-400 bg-slate-100 px-3 py-2 rounded-xl">
+                                    {filteredRows.length} lượt
+                                </span>
+                            </div>
                         </h3>
 
                         {groupedAttendance.length === 0 ? (

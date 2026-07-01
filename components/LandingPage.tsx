@@ -82,7 +82,7 @@ const LandingPage: React.FC<LandingPageProps> = ({ onLoginClick, isAuthenticated
                                 </span>
                             </h1>
                             <p className="text-lg md:text-xl text-slate-500 font-medium max-w-2xl mx-auto mb-12 leading-relaxed animate-in fade-in slide-in-from-bottom-8 duration-1000">
-                                Hệ thống trực tuyến tra cứu và quản lý tình hình học tập của các em thiếu nhi.
+                                Hệ thống trực tuyến tra cứu và quản lý tình hình học tập của các em thiếu nhi các giáo xứ.
                             </p>
 
                             <div className="flex flex-col md:flex-row items-center justify-center gap-4 animate-in fade-in slide-in-from-bottom-10 duration-1000">

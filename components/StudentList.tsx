@@ -8,6 +8,7 @@ import {
 } from 'lucide-react';
 import StudentProfile from './StudentProfile';
 import { SCORE_TYPES } from '../constants';
+import { toast } from 'react-hot-toast';
 
 interface StudentListProps {
   userRole: string;
@@ -73,7 +74,7 @@ const StudentList: React.FC<StudentListProps> = ({ userRole, assignedClasses = '
       setClasses(uniqueClasses);
     } catch (err) {
       console.error(err);
-      alert('Lỗi tải danh sách học sinh');
+      toast.error('Lỗi tải danh sách học sinh');
     } finally {
       setLoading(false);
     }
@@ -112,14 +113,14 @@ const StudentList: React.FC<StudentListProps> = ({ userRole, assignedClasses = '
     try {
       const res = await api.deleteStudent(studentId);
       if (res.success) {
-        alert('Đã xóa thành công');
+        toast.success('Đã xóa thành công');
         await fetchData();
       } else {
-        alert('Lỗi: ' + res.message);
+        toast.error('Lỗi: ' + res.message);
         setLoading(false);
       }
     } catch (error) {
-      alert('Lỗi hệ thống');
+      toast.error('Lỗi hệ thống');
       setLoading(false);
     }
   };
@@ -127,7 +128,7 @@ const StudentList: React.FC<StudentListProps> = ({ userRole, assignedClasses = '
   const handleSaveStudent = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!currentStudent.ten || !currentStudent.lop) {
-      alert('Vui lòng nhập Tên và Lớp');
+      toast.error('Vui lòng nhập Tên và Lớp');
       return;
     }
 
@@ -135,17 +136,17 @@ const StudentList: React.FC<StudentListProps> = ({ userRole, assignedClasses = '
     try {
       if (currentStudent.id) {
         const res = await api.updateStudent(currentStudent.id, currentStudent);
-        if (res.success) alert('Cập nhật thành công');
-        else alert(res.message);
+        if (res.success) toast.success('Cập nhật thành công');
+        else toast.error(res.message);
       } else {
         const res = await api.addStudent(currentStudent);
-        if (res.success) alert('Thêm mới thành công');
-        else alert(res.message);
+        if (res.success) toast.success('Thêm mới thành công');
+        else toast.error(res.message);
       }
       setIsEditModalOpen(false);
       fetchData();
     } catch (error) {
-      alert('Lỗi hệ thống');
+      toast.error('Lỗi hệ thống');
     } finally {
       setSaving(false);
     }
@@ -625,7 +626,8 @@ const StudentList: React.FC<StudentListProps> = ({ userRole, assignedClasses = '
                           <div className="text-5xl font-black tracking-tight">{studentScores?.average || '--'}</div>
                         </div>
 
-                        <div className={`flex items-center justify-center px-10 py-6 rounded-[2rem] border-4 shadow-lg ${studentScores?.rank === 'Giỏi' ? 'bg-green-50 border-green-100 text-green-700' :
+                        <div className={`flex items-center justify-center px-10 py-6 rounded-[2rem] border-4 shadow-lg ${studentScores?.rank === 'Xuất sắc' ? 'bg-purple-50 border-purple-100 text-purple-700' :
+                          studentScores?.rank === 'Giỏi' ? 'bg-green-50 border-green-100 text-green-700' :
                           studentScores?.rank === 'Khá' ? 'bg-blue-50 border-blue-100 text-blue-700' :
                             studentScores?.rank === 'Trung bình' ? 'bg-yellow-50 border-yellow-100 text-yellow-700' :
                               studentScores?.rank === 'Yếu' ? 'bg-red-50 border-red-100 text-red-700' : 'bg-slate-50 border-slate-100 text-slate-400'

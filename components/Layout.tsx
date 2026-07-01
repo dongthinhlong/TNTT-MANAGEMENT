@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import {
   Users,
   GraduationCap,
@@ -8,7 +8,8 @@ import {
   LayoutDashboard,
   Home,
   Moon,
-  Sun
+  Sun,
+  Bell
 } from 'lucide-react';
 
 interface LayoutProps {
@@ -33,6 +34,19 @@ const Layout: React.FC<LayoutProps> = ({
   const isGuest = userRole === 'GUEST';
 
   const academicYear = localStorage.getItem('tntt_academic_year') || '2025-2026';
+
+  const [dropdownOpen, setDropdownOpen] = useState(false);
+  const dropdownRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const handleClickOutside = (e: MouseEvent) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(e.target as Node)) {
+        setDropdownOpen(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
 
   const functionalGroups = [
     { id: 'hub',        label: 'Trang chủ', icon: Home,         color: 'blue',   show: true },
@@ -113,30 +127,37 @@ const Layout: React.FC<LayoutProps> = ({
 
         {/* Right: Year badge + Account (flex-1) */}
         <div className="flex-1 flex items-center justify-end gap-2 sm:gap-3">
-          {/* Year badge */}
-          <div
-            className="flex items-center bg-blue-50 border border-blue-200 rounded-xl px-2 sm:px-3 py-1 cursor-pointer hover:bg-blue-100 transition-colors"
-            onClick={() => isAdmin && onTabChange('database')}
-            title="Năm học hiện tại"
-          >
-            <span className="text-[10px] sm:text-xs font-black text-blue-600">{academicYear}</span>
-          </div>
+          {/* Admin Notifications Pin */}
+          {isAdmin && (
+            <button
+              onClick={() => onTabChange('notifications')}
+              className={`relative p-2 rounded-xl transition-all duration-200 group/bell ${activeTab === 'notifications' ? 'bg-indigo-50 text-indigo-600 shadow-inner' : 'hover:bg-slate-100 text-slate-400 hover:text-slate-600'}`}
+              title="Thông báo hệ thống"
+            >
+              <Bell className={`h-5 w-5 ${activeTab === 'notifications' ? 'fill-indigo-600' : ''} group-hover/bell:scale-110 transition-transform`} />
+              {/* Optional: red dot for new notifications could be added here if we had state for it */}
+              <div className="absolute top-1.5 right-1.5 w-2 h-2 bg-rose-500 rounded-full border-2 border-white animate-pulse" />
+            </button>
+          )}
 
           <div className="h-5 w-px bg-slate-200" />
 
           {/* User Account Dropdown */}
-          <div className="group relative">
-            <div className="flex items-center gap-2 p-1 pl-2 rounded-full hover:bg-slate-100 transition-colors cursor-pointer">
+          <div ref={dropdownRef} className="relative">
+            <button
+              onClick={() => setDropdownOpen(prev => !prev)}
+              className="flex items-center gap-2 p-1 pl-2 rounded-full hover:bg-slate-100 transition-colors cursor-pointer"
+            >
               <span className="text-xs font-bold text-slate-700 hidden lg:block max-w-[100px] truncate">
                 {userEmail?.split('@')[0]}
               </span>
               <div className="h-8 w-8 rounded-full bg-blue-100 flex items-center justify-center text-blue-600 font-black text-sm border-2 border-white shadow-sm flex-shrink-0">
                 {userEmail?.charAt(0).toUpperCase() || 'G'}
               </div>
-            </div>
+            </button>
 
             {/* Dropdown */}
-            <div className="absolute right-0 mt-2 w-56 bg-white rounded-2xl shadow-2xl border border-slate-100 p-2 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50">
+            <div className={`absolute right-0 mt-2 w-56 bg-white rounded-2xl shadow-2xl border border-slate-100 p-2 transition-all duration-200 z-50 ${dropdownOpen ? 'opacity-100 visible' : 'opacity-0 invisible'}`}>
               <div className="p-4 border-b border-slate-50 mb-1">
                 <p className="text-xs font-black text-slate-400 uppercase tracking-widest mb-1">Tài khoản</p>
                 <p className="text-sm font-bold text-slate-800 truncate">{userEmail}</p>

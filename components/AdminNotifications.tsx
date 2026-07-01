@@ -51,7 +51,7 @@ const AdminNotifications: React.FC = () => {
                         </div>
                         Thông báo & Yêu cầu
                     </h1>
-                    <p className="text-slate-500 mt-1 font-medium">Quản lý các yêu cầu cấp quyền từ người dùng</p>
+                    <p className="text-slate-500 mt-1 font-medium">Quản lý các yêu cầu cấp quyền và hỗ trợ từ người dùng</p>
                 </div>
                 <button
                     onClick={fetchNotifications}
@@ -81,9 +81,14 @@ const AdminNotifications: React.FC = () => {
                                 <div>
                                     <div className="flex items-center gap-2 flex-wrap">
                                         <h4 className="font-bold text-slate-800">{note.email}</h4>
-                                        <span className="text-[10px] font-black px-2 py-0.5 bg-amber-50 text-amber-600 rounded-full uppercase">Yêu cầu cấp quyền</span>
+                                        <span className={`text-[10px] font-black px-2 py-0.5 rounded-full uppercase ${note.subject?.includes('YÊU CẦU CẤP QUYỀN') ? 'bg-amber-50 text-amber-600' : 'bg-blue-50 text-blue-600'}`}>
+                                            {note.subject?.includes('YÊU CẦU CẤP QUYỀN') ? 'Yêu cầu cấp quyền' : 'Hỗ trợ / Góp ý'}
+                                        </span>
                                     </div>
-                                    <p className="text-slate-600 text-sm mt-2 whitespace-pre-wrap bg-slate-50 p-3 rounded-xl border border-slate-100 italic">
+                                    {note.subject && !note.subject?.includes('YÊU CẦU CẤP QUYỀN') && (
+                                        <p className="text-slate-500 text-xs font-bold mt-2">Tiêu đề: {note.subject}</p>
+                                    )}
+                                    <p className="text-slate-600 text-sm mt-1 whitespace-pre-wrap bg-slate-50 p-3 rounded-xl border border-slate-100 italic">
                                         "{note.message}"
                                     </p>
                                     <div className="flex items-center gap-3 mt-3 text-xs text-slate-400 font-medium">

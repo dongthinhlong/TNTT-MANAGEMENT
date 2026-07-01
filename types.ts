@@ -40,6 +40,7 @@ export interface ClassSummary {
   averageScore: string;
   classRanking: string;
   rankings: {
+    'Xuất sắc': number;
     'Giỏi': number;
     'Khá': number;
     'Trung bình': number;

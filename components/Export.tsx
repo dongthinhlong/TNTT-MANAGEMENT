@@ -164,7 +164,6 @@ const Export: React.FC<ExportProps> = ({ userRole = 'GUEST', assignedClasses = '
                             <h3 className="relative z-10 font-black text-2xl text-slate-800 tracking-tight group-hover:text-green-700 transition-colors">Bảng điểm tổng hợp</h3>
                             <p className="relative z-10 text-sm text-slate-400 font-bold mt-2 px-4 uppercase tracking-tighter">Điểm thi, điểm chuyên cần & kết quả xếp loại</p>
                         </button>
-
                     </div>
 
                     {loading && (
