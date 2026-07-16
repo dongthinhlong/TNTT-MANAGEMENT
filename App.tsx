@@ -62,6 +62,12 @@ const App: React.FC = () => {
       return; // Stop further auth checks if in Guest Mode
     }
 
+    // ⚡ QR mới dạng /?id=HS001 (không có view=profile)
+    if (idParam && !viewParam) {
+      setGuestProfileId(idParam);
+      return;
+    }
+
     if (viewParam === 'search') {
       setIsSearchMode(true);
       return;

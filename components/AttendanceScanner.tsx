@@ -3,6 +3,7 @@ import { Html5QrcodeScanner, Html5QrcodeScanType } from 'html5-qrcode';
 import { ScanLine, FileText, CheckCircle, AlertCircle, Keyboard, Loader, HelpCircle, X, Info, Download, FileSpreadsheet } from 'lucide-react';
 import AttendanceReport from './AttendanceReport';
 import { api } from '../services/gasApi';
+import { extractStudentId } from '../utils/qrUtils';
 
 interface AttendanceScannerProps {
   userRole: string;
@@ -173,32 +174,33 @@ const AttendanceScanner: React.FC<AttendanceScannerProps> = ({ userRole }) => {
   }, [activeSubTab]);
 
   const onScanSuccess = (decodedText: string) => {
-    const idToSend = decodedText.trim();
-    if (!idToSend) return;
+    // ⚡ An toàn: Trích xuất ID từ QR cũ (text) hoặc QR mới (URL)
+    const studentId = extractStudentId(decodedText);
+    if (!studentId) return;
 
     // ⚡ CHIẾN THUẬT DEBOUNCE: Chống quét nhanh nhiều lần (0ms delay)
-    if (processingIdsRef.current.has(idToSend)) return;
-    processingIdsRef.current.add(idToSend);
+    if (processingIdsRef.current.has(studentId)) return;
+    processingIdsRef.current.add(studentId);
 
     // Xoá sau 2 giây để cho phép quét lại nếu cần (ví dụ cho lượt khác) 
     // Nhưng todayScannedIds vẫn sẽ chặn nếu là trong cùng ngày
-    setTimeout(() => processingIdsRef.current.delete(idToSend), 2000);
+    setTimeout(() => processingIdsRef.current.delete(studentId), 2000);
 
-    console.log(`[Scanner] Đã đọc mã: ${idToSend}`);
+    console.log(`[Scanner] Đã đọc mã: ${studentId}`);
 
     // ⚡ Tìm thông tin linh hoạt (Hỗ trợ tiền tốID, HS hoặc ID trần)
-    const lookupId = idToSend.toLowerCase();
-    const cleanId = idToSend.replace(/^(ID|HS)/i, '').toLowerCase();
+    const lookupId = studentId.toLowerCase();
+    const cleanId = studentId.replace(/^(ID|HS)/i, '').toLowerCase();
 
     // Tìm trong map bản gốc, bản thường, hoặc bản đã xóa tiền tố HS/ID
-    const studentInfo = studentMap.get(idToSend) ||
+    const studentInfo = studentMap.get(studentId) ||
       studentMap.get(lookupId) ||
       studentMap.get(cleanId) ||
-      { name: idToSend, className: '---' }; // FALLBACK: Hiện ID thay vì "Chưa gán tên"
+      { name: studentId, className: '---' }; // FALLBACK: Hiện ID thay vì "Chưa gán tên"
 
     // ⚡ Kiểm tra trùng tại máy khách (render-stable check)
-    if (todayScannedIds.has(idToSend) || todayScannedIds.has(lookupId) || todayScannedIds.has(cleanId)) {
-      console.log(`[Scanner] ✋ Trùng lặp local: ${idToSend}.`);
+    if (todayScannedIds.has(studentId) || todayScannedIds.has(lookupId) || todayScannedIds.has(cleanId)) {
+      console.log(`[Scanner] ✋ Trùng lặp local: ${studentId}.`);
       if (scannerStatus === 'idle') {
         const name = studentInfo.name;
         setErrorMessage(`ID ${name} đã điểm danh hôm nay rồi!`);
@@ -209,7 +211,7 @@ const AttendanceScanner: React.FC<AttendanceScannerProps> = ({ userRole }) => {
     }
 
     const timeStr = new Date().toLocaleTimeString('vi-VN');
-    const tempEntry = { id: idToSend, name: studentInfo.name, className: studentInfo.className, time: timeStr, status: 'pending' };
+    const tempEntry = { id: studentId, name: studentInfo.name, className: studentInfo.className, time: timeStr, status: 'pending' };
 
     // ✅ Cập nhật UI NGAY LẬP TỨC (Optimistic UI) — hiện ID/Tên luôn
     setScannedList(prev => [tempEntry, ...prev].slice(0, 100));
@@ -217,22 +219,22 @@ const AttendanceScanner: React.FC<AttendanceScannerProps> = ({ userRole }) => {
     setScannerStatus('success');
 
     // 🔇 Gửi GAS ở background 
-    setPendingIds(prev => new Set(prev).add(idToSend + '_' + timeStr));
-    setTodayScannedIds(prev => new Set(prev).add(idToSend));
+    setPendingIds(prev => new Set(prev).add(studentId + '_' + timeStr));
+    setTodayScannedIds(prev => new Set(prev).add(studentId));
 
-    console.log(`[GAS] Đang gửi yêu cầu ghi nhận cho: ${idToSend}...`);
-    api.recordAttendance(idToSend)
+    console.log(`[GAS] Đang gửi yêu cầu ghi nhận cho: ${studentId}...`);
+    api.recordAttendance(studentId)
       .then((result: any) => {
         console.log(`[GAS] Phản hồi từ server:`, result);
         if (result.success) {
           setScannedList(prev => prev.map(item =>
-            item.id === idToSend && item.time === timeStr
+            item.id === studentId && item.time === timeStr
               ? { ...item, status: 'OK' }
               : item
           ));
         } else if (result.isDuplicate) {
           setScannedList(prev => prev.map(item =>
-            item.id === idToSend && item.time === timeStr
+            item.id === studentId && item.time === timeStr
               ? { ...item, status: 'duplicate' }
               : item
           ));
@@ -243,23 +245,23 @@ const AttendanceScanner: React.FC<AttendanceScannerProps> = ({ userRole }) => {
           setErrorMessage(result.message || 'Lỗi từ hệ thống. Hãy thử lại!');
           setScannerStatus('error');
           setScannedList(prev => prev.map(item =>
-            item.id === idToSend && item.time === timeStr
+            item.id === studentId && item.time === timeStr
               ? { ...item, status: 'error' }
               : item
           ));
         }
-        setPendingIds(prev => { const n = new Set(prev); n.delete(idToSend + '_' + timeStr); return n; });
+        setPendingIds(prev => { const n = new Set(prev); n.delete(studentId + '_' + timeStr); return n; });
       })
       .catch((err: any) => {
         console.error('[Attendance] Lỗi ghi GAS:', err);
         setErrorMessage('Lỗi kết nối mạng. ID này sẽ được lưu tạm.');
         setScannerStatus('error');
         setScannedList(prev => prev.map(item =>
-          item.id === idToSend && item.time === timeStr
+          item.id === studentId && item.time === timeStr
             ? { ...item, status: 'error' }
             : item
         ));
-        setPendingIds(prev => { const n = new Set(prev); n.delete(idToSend + '_' + timeStr); return n; });
+        setPendingIds(prev => { const n = new Set(prev); n.delete(studentId + '_' + timeStr); return n; });
         setTimeout(() => setScannerStatus('idle'), 4000);
       });
   };

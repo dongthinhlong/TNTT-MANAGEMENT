@@ -98,4 +98,12 @@ export const api = {
   getAcademicYears: () => callGasApi<Record<string, string>>('getAcademicYears'),
   addAcademicYear: (year: string, sheetId: string) => callGasApi<ApiResponse<any>>('addAcademicYear', year, sheetId),
   deleteAcademicYear: (year: string) => callGasApi<ApiResponse<any>>('deleteAcademicYear', year),
+
+  // Attendance Summary
+  getStudentAttendanceSummary: (studentId: string) =>
+    callGasApi<{ present: number; totalLessons: number; percentage: string }>('getStudentAttendanceSummary', studentId),
+
+  // Public API - An toàn cho Guest, chỉ trả về 1 học viên
+  getStudentPublicProfile: (studentId: string) =>
+    callGasApi<{ student: any[]; scores: any; attendance: { present: number; totalLessons: number; percentage: string } }>('getStudentPublicProfile', studentId),
 };

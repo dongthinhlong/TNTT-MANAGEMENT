@@ -18,8 +18,8 @@ interface Student {
 
 const BASE_URL = `${window.location.protocol}//${window.location.host}`;
 
-/** Tạo URL điểm danh: chỉ chứa ID để Scanner đọc */
-const getQrValue = (studentId: string) => studentId;
+/** Tạo URL cho QR: chứa ID để Scanner đọc và mở web app */
+const getQrValue = (studentId: string) => `${BASE_URL}/?id=${studentId}`;
 
 /** Tên đầy đủ */
 const fullName = (s: Student) =>

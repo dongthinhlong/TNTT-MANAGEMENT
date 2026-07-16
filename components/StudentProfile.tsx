@@ -3,7 +3,7 @@ import { QRCodeCanvas } from "qrcode.react";
 import {
     Trophy, Star, Calendar, User, Hash,
     Download, Share2, ShieldCheck, Sparkles, MapPin,
-    GraduationCap
+    GraduationCap, Smartphone, CalendarDays, CheckCircle
 } from "lucide-react";
 import { api } from "../services/gasApi";
 import { Student } from "../types";
@@ -26,6 +26,8 @@ const StudentProfile: React.FC<StudentProfileProps> = ({
     const [data, setData] = useState<any>(initialData || null);
     const [loading, setLoading] = useState(!initialData);
     const [error, setError] = useState("");
+    const [availableYears, setAvailableYears] = useState<string[]>([]);
+    const [selectedYear, setSelectedYear] = useState(localStorage.getItem('tntt_academic_year') || '2025-2026');
     const qrRef = useRef<HTMLDivElement>(null);
 
     // Helper: Logic from StudentList to map array to object
@@ -126,7 +128,54 @@ const StudentProfile: React.FC<StudentProfileProps> = ({
         }
     }, [studentId, data, simpleQrMode]);
 
-    // If data provided by parent (Admin view), use it.
+    // ⚡ Fetch dữ liệu khi studentId hoặc selectedYear thay đổi
+    useEffect(() => {
+        if (!studentId) return;
+
+        const fetchAll = async () => {
+            setLoading(true);
+            try {
+                localStorage.setItem('tntt_academic_year', selectedYear);
+                
+                // ⚡ Gọi 1 API Public duy nhất (an toàn, hiệu quả)
+                const profile: any = await api.getStudentPublicProfile(studentId);
+                
+                if (profile?.error) {
+                    setError(profile.error);
+                    return;
+                }
+                
+                if (profile?.student) {
+                    const studentObj = mapRowToStudent(profile.student);
+                    setData({
+                        ...studentObj,
+                        name: studentObj.tenThanh ? `${studentObj.tenThanh} ${studentObj.hoDem} ${studentObj.ten}` : `${studentObj.hoDem} ${studentObj.ten}`,
+                        class: studentObj.lop,
+                        dob: formatDateVal(studentObj.ngaySinh),
+                        ngayRuaToi: studentObj.ngayRuaToi,
+                        averageScore: profile.scores?.average || 0,
+                        rank: profile.scores?.rank || "Chưa có",
+                        scores: profile.scores?.scores || {}
+                    });
+                }
+                
+                // Lấy danh sách năm học
+                try {
+                    const years = await api.getAcademicYears();
+                    setAvailableYears(Object.keys(years));
+                } catch { }
+            } catch (err) {
+                console.error(err);
+                setError("Lỗi tải dữ liệu.");
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        fetchAll();
+    }, [studentId, selectedYear, simpleQrMode]);
+
+    // Kế thừa dữ liệu từ initialData
     useEffect(() => {
         if (initialData) setData(initialData);
     }, [initialData]);
@@ -280,6 +329,21 @@ const StudentProfile: React.FC<StudentProfileProps> = ({
                             </div>
                         </div>
 
+                        {/* Year Selector */}
+                        {availableYears.length > 1 && (
+                            <div className="mb-5">
+                                <select
+                                    value={selectedYear}
+                                    onChange={(e) => setSelectedYear(e.target.value)}
+                                    className="w-full px-4 py-2.5 rounded-xl bg-slate-100 border border-slate-200 text-sm font-bold text-slate-700 focus:outline-none focus:ring-2 focus:ring-blue-500/30"
+                                >
+                                    {availableYears.map((y) => (
+                                        <option key={y} value={y}>{y}</option>
+                                    ))}
+                                </select>
+                            </div>
+                        )}
+
                         {/* Stats Grid */}
                         <div className="grid grid-cols-2 gap-4 mb-8">
                             <div className="p-5 rounded-[1.5rem] bg-slate-50 border border-slate-100 flex flex-col items-center hover:bg-slate-100 transition-colors">
@@ -378,7 +442,7 @@ const StudentProfile: React.FC<StudentProfileProps> = ({
                 )}
                 {isGuestView && (
                     <div className="pt-6 border-t border-slate-50">
-                        <p className="text-[10px] text-slate-300 uppercase tracking-[0.3em] font-bold">
+                        <p className="text-[10px] text-slate-300 uppercase tracking-[0.3em] font-bold text-center">
                             TNTT MANAGEMENT
                         </p>
                     </div>

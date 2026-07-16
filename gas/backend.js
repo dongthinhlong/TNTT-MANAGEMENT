@@ -71,7 +71,8 @@ function doPost(e) {
             'sendSupportTicket', 'getNotifications', 'deleteNotification',
             'getAttendanceReport', 'recordAttendance', 'getTodayScannedIds',
             'exportAttendanceReport', // MỚI
-            'getAcademicYears', 'addAcademicYear', 'deleteAcademicYear' // MỚI
+            'getAcademicYears', 'addAcademicYear', 'deleteAcademicYear', // MỚI
+            'getStudentPublicProfile', 'getStudentAttendanceSummary' // Public APIs
         ];
 
         if (whitelist.includes(functionName) && typeof this[functionName] === 'function') {
@@ -992,4 +993,86 @@ function deleteAcademicYear(year) {
     delete map[year];
     PropertiesService.getScriptProperties().setProperty('TNTT_DB_MAP', JSON.stringify(map));
     return { success: true, message: "Đã xoá năm học " + year };
+}
+
+/**
+ * Attendance Map có cache (giống getGradesMap)
+ * Cache 5 phút, chỉ quét sheet 1 lần
+ */
+function getAttendanceMap() {
+    const CACHE_KEY = "ATTENDANCE_MAP_V2_" + _CURRENT_ACADEMIC_YEAR;
+    const cache = CacheService.getScriptCache();
+    const cached = cache.get(CACHE_KEY);
+    if (cached) return JSON.parse(cached);
+
+    var data = getValues(SHEET_ATTENDANCE).slice(1);
+    var presentCount = {};
+    var uniqueDates = {};
+    
+    for (var i = 0; i < data.length; i++) {
+        if (!data[i][0]) continue;
+        
+        var dateStr = '';
+        try {
+            if (data[i][0] instanceof Date) {
+                dateStr = Utilities.formatDate(data[i][0], 'Asia/Ho_Chi_Minh', 'yyyy-MM-dd');
+            } else {
+                var raw = String(data[i][0]);
+                dateStr = raw.split(' ')[0];
+                var vnMatch = raw.match(/^(\d{2})\/(\d{2})\/(\d{4})/);
+                if (vnMatch) dateStr = vnMatch[3] + '-' + vnMatch[2] + '-' + vnMatch[1];
+            }
+        } catch(e) { continue; }
+        
+        uniqueDates[dateStr] = true;
+        
+        var sid = String(data[i][1]);
+        if (sid) {
+            presentCount[sid] = (presentCount[sid] || 0) + 1;
+        }
+    }
+
+    var totalLessons = Object.keys(uniqueDates).length;
+    var result = { present: presentCount, totalLessons: totalLessons };
+    
+    try { cache.put(CACHE_KEY, JSON.stringify(result), 300); } catch(e) {}
+    return result;
+}
+
+function getStudentAttendanceSummary(studentId) {
+    if (!studentId) return { present: 0, totalLessons: 0, percentage: '0%' };
+    var map = getAttendanceMap();
+    var present = map.present[studentId] || 0;
+    var total = map.totalLessons;
+    var pct = total > 0 ? Math.round(present / total * 100) : 0;
+    return { present: present, totalLessons: total, percentage: pct + '%' };
+}
+
+/**
+ * API Public - An toàn cho Guest
+ * Chỉ trả về thông tin của 1 học viên cụ thể (không lộ toàn bộ danh sách)
+ */
+function getStudentPublicProfile(studentId) {
+    if (!studentId) return { error: 'Thiếu mã học viên' };
+    
+    var allStudents = getAllStudents();
+    var student = null;
+    for (var i = 0; i < allStudents.length; i++) {
+        if (String(allStudents[i][0]) === String(studentId)) {
+            student = allStudents[i];
+            break;
+        }
+    }
+    
+    if (!student) return { error: 'Không tìm thấy học viên' };
+    
+    var gradesMap = getGradesMap();
+    var scores = gradesMap[studentId] || { scores: {}, average: 'N/A', rank: '---' };
+    var attendance = getStudentAttendanceSummary(studentId);
+    
+    return {
+        student: student,
+        scores: scores,
+        attendance: attendance
+    };
 }

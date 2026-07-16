@@ -31,3 +31,6 @@ BOOTSTRAP.md
 HEARTBEAT.md
 TOOLS.md
 AGENTS.md
+
+# Environment files
+.env
