@@ -1,4 +1,5 @@
 import { ApiResponse, ClassSummary, OverallStats } from '../types';
+import { getDefaultAcademicYear } from '../constants';
 
 // IMPORTANT: Replace this with your deployed Google Apps Script Web App URL
 // Deploy Instructions: Deploy as Web App -> Execute as Me -> Access: Anyone
@@ -14,8 +15,8 @@ async function callGasApi<T>(functionName: string, ...args: any[]): Promise<T> {
 
   // Retrieve the logged-in email to emulate session for GAS "Execute as Me" deployments
   const userEmail = localStorage.getItem('tntt_user_email') || '';
-  // MỚI: Lấy Năm Học hiện tại được chọn (mặc định là 2025-2026)
-  const academicYear = localStorage.getItem('tntt_academic_year') || '2025-2026';
+  // Năm Học hiện tại (động dựa trên thời gian thực)
+  const academicYear = localStorage.getItem('tntt_academic_year') || getDefaultAcademicYear();
 
   try {
     const response = await fetch(GAS_API_URL, {

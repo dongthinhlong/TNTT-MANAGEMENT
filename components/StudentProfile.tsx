@@ -7,6 +7,7 @@ import {
 } from "lucide-react";
 import { api } from "../services/gasApi";
 import { Student } from "../types";
+import { getDefaultAcademicYear } from "../constants";
 
 interface StudentProfileProps {
     studentId?: string;
@@ -27,7 +28,7 @@ const StudentProfile: React.FC<StudentProfileProps> = ({
     const [loading, setLoading] = useState(!initialData);
     const [error, setError] = useState("");
     const [availableYears, setAvailableYears] = useState<string[]>([]);
-    const [selectedYear, setSelectedYear] = useState(localStorage.getItem('tntt_academic_year') || '2025-2026');
+    const [selectedYear, setSelectedYear] = useState(localStorage.getItem('tntt_academic_year') || getDefaultAcademicYear());
     const qrRef = useRef<HTMLDivElement>(null);
 
     // Helper: Logic from StudentList to map array to object

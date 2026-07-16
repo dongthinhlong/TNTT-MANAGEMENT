@@ -8,6 +8,7 @@ import {
   Users, ChevronRight, ChevronLeft, CheckSquare, Square, Loader, X, Upload, ImageIcon
 } from 'lucide-react';
 import { api } from '../services/gasApi';
+import { getDefaultAcademicYear } from '../constants';
 
 interface Student {
   id: string;
@@ -22,7 +23,7 @@ interface BadgePrinterProps {
   assignedClasses?: string;
 }
 
-const SCHOOL_YEAR = localStorage.getItem('tntt_academic_year') || '2025-2026';
+const SCHOOL_YEAR = localStorage.getItem('tntt_academic_year') || getDefaultAcademicYear();
 
 // px dimensions @96dpi → 8.6cm×5.4cm
 const CARD_W_PX = 325;

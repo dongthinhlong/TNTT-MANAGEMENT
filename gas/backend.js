@@ -12,7 +12,14 @@
 // Hệ thống giờ đây sử dụng PropertiesService để lưu trữ danh sách năm học.
 // Bạn KHÔNG CẦN sửa code khi thêm năm học mới nữa!
 
-const DEFAULT_YEAR = "2025-2026"; // Năm học mặc định
+// Tính năm học động: Nếu tháng >= 7 → năm nay-năm sau, ngược lại → năm trước-năm nay
+function computeDefaultYear() {
+  var now = new Date();
+  var y = now.getFullYear();
+  var m = now.getMonth() + 1; // 1-indexed
+  return (m >= 7) ? (y + "-" + (y + 1)) : ((y - 1) + "-" + y);
+}
+var DEFAULT_YEAR = computeDefaultYear();
 
 // Hàm nội bộ để lấy danh sách CSDL từ bộ nhớ của Script
 function getDatabaseMap() {
@@ -20,10 +27,8 @@ function getDatabaseMap() {
     var mapStr = props.getProperty('TNTT_DB_MAP');
     if (!mapStr) {
         // Khởi tạo dữ liệu mặc định ban đầu
-        var defaultMap = {
-            "2025-2026": "YOUR_SPREADSHEET_ID_HERE"
-
-        };
+        var defaultMap = {};
+        defaultMap[DEFAULT_YEAR] = "YOUR_SPREADSHEET_ID_HERE";
         props.setProperty('TNTT_DB_MAP', JSON.stringify(defaultMap));
         return defaultMap;
     }

@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { api } from '../services/gasApi';
 import { Database, Plus, Trash2, RefreshCw, Info, ExternalLink } from 'lucide-react';
+import { getDefaultAcademicYear } from '../constants';
 
 interface AcademicYearManagerProps {
   userRole: string;
@@ -59,7 +60,7 @@ const AcademicYearManager: React.FC<AcademicYearManagerProps> = ({ userRole }) =
   };
 
   const handleDelete = async (year: string) => {
-    if (year === '2025-2026') {
+    if (year === getDefaultAcademicYear()) {
       alert('Không thể xoá năm học mặc định!');
       return;
     }
@@ -118,7 +119,7 @@ const AcademicYearManager: React.FC<AcademicYearManagerProps> = ({ userRole }) =
                     >
                       <ExternalLink className="h-4 w-4" />
                     </a>
-                    {year !== '2025-2026' && (
+                    {year !== getDefaultAcademicYear() && (
                       <button
                         onClick={() => handleDelete(year)}
                         className="p-2 text-red-400 hover:text-red-600 hover:bg-red-50 rounded-xl"

@@ -11,6 +11,7 @@ import {
   Sun,
   Bell
 } from 'lucide-react';
+import { getDefaultAcademicYear } from '../constants';
 
 interface LayoutProps {
   children: React.ReactNode;
@@ -33,7 +34,7 @@ const Layout: React.FC<LayoutProps> = ({
   const isTeacher = userRole === 'TEACHER' || isAdmin;
   const isGuest = userRole === 'GUEST';
 
-  const academicYear = localStorage.getItem('tntt_academic_year') || '2025-2026';
+  const academicYear = localStorage.getItem('tntt_academic_year') || getDefaultAcademicYear();
 
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
@@ -168,16 +169,19 @@ const Layout: React.FC<LayoutProps> = ({
               <div className="p-2 border-b border-slate-50 mb-1">
                 <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-1.5 px-2">Năm học</label>
                 <select
-                  value={localStorage.getItem('tntt_academic_year') || '2025-2026'}
+                  value={localStorage.getItem('tntt_academic_year') || getDefaultAcademicYear()}
                   onChange={(e) => {
                     localStorage.setItem('tntt_academic_year', e.target.value);
                     window.location.reload();
                   }}
                   className="w-full bg-slate-50 rounded-xl px-2 py-1.5 text-xs font-bold text-slate-700 border border-slate-200"
                 >
-                  {(JSON.parse(localStorage.getItem('tntt_available_years') || '["2025-2026"]')).sort().map((year: string) => (
-                    <option key={year} value={year}>{year}</option>
-                  ))}
+                  {(JSON.parse(localStorage.getItem('tntt_available_years') || '[]')).length > 0
+                    ? (JSON.parse(localStorage.getItem('tntt_available_years') || '[]')).sort().map((year: string) => (
+                        <option key={year} value={year}>{year}</option>
+                      ))
+                    : <option value={getDefaultAcademicYear()}>{getDefaultAcademicYear()}</option>
+                  }
                 </select>
               </div>
 

@@ -1,4 +1,5 @@
 import React from 'react';
+import { getDefaultAcademicYear } from '../constants';
 import {
     Users,
     Search,
@@ -24,7 +25,7 @@ const Hub: React.FC<HubProps> = ({ userRole, onTabChange }) => {
     const isAdmin = userRole === 'ADMIN';
     const isTeacher = userRole === 'TEACHER' || isAdmin;
     const isGuest = userRole === 'GUEST';
-    const currentYear = localStorage.getItem('tntt_academic_year') || '2025-2026';
+    const currentYear = localStorage.getItem('tntt_academic_year') || getDefaultAcademicYear();
 
     const groups = [
         {
